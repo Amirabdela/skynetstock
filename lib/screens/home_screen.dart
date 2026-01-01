@@ -272,12 +272,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () async {
                     if (formKey.currentState?.validate() ?? false) {
                       formKey.currentState?.save();
-                      await Provider.of<StockProvider>(
+                      final navigator = Navigator.of(context);
+                      final prov = Provider.of<StockProvider>(
                         context,
                         listen: false,
-                      ).addItem(name, quantity);
+                      );
+                      await prov.addItem(name, quantity);
                       if (!mounted) return;
-                      Navigator.of(context).pop();
+                      navigator.pop();
                     }
                   },
                   child: const Text('Add'),
