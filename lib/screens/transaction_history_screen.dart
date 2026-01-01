@@ -13,7 +13,8 @@ class TransactionHistoryScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Transactions')),
       body: prov.transactions.isEmpty
           ? const Center(child: Text('No transactions yet'))
-          : ListView.builder(
+          : ListView.separated(
+              separatorBuilder: (_, __) => const Divider(height: 1),
               itemCount: prov.transactions.length,
               itemBuilder: (_, i) {
                 final t = prov.transactions[i];
@@ -27,10 +28,19 @@ class TransactionHistoryScreen extends StatelessWidget {
                 );
                 final itemName = matched.name;
                 final dt = DateTime.fromMillisecondsSinceEpoch(t.timestamp);
+                final isIn = t.delta > 0;
                 return ListTile(
-                  title: Text(
-                    '$itemName — ${t.delta > 0 ? '+' : ''}${t.delta}',
+                  leading: CircleAvatar(
+                    backgroundColor: isIn
+                        ? Colors.green.shade600
+                        : Colors.red.shade600,
+                    child: Icon(
+                      isIn ? Icons.arrow_upward : Icons.arrow_downward,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                   ),
+                  title: Text('$itemName — ${isIn ? '+' : ''}${t.delta}'),
                   subtitle: Text(
                     '${dt.toLocal()}${t.note != null ? ' · ${t.note}' : ''}',
                   ),

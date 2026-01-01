@@ -65,4 +65,12 @@ class StockProvider extends ChangeNotifier {
     if (delta == 0) return;
     await _applyTransaction(itemId, delta, note ?? 'Set Quantity');
   }
+
+  /// Returns the most recent transaction for an item, or null.
+  StockTransaction? lastTransactionFor(int itemId) {
+    for (final t in transactions) {
+      if (t.itemId == itemId) return t;
+    }
+    return null;
+  }
 }

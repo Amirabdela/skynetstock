@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ) async {
     final formKey = GlobalKey<FormState>();
     int newQty = current;
-    await showDialog(
+    await showDialog<void>(
       context: ctx,
       builder: (_) => AlertDialog(
         title: const Text('Set Quantity'),
@@ -132,6 +132,73 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _openAddDialog(BuildContext context) {
+    final outerContext = context;
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        final formKey = GlobalKey<FormState>();
+        String name = '';
+        int quantity = 0;
+        return AlertDialog(
+          title: const Text('Add Item'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Enter name' : null,
+                  onSaved: (v) => name = v!.trim(),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Initial quantity',
+                  ),
+                  keyboardType: TextInputType.number,
+                  initialValue: '0',
+                  validator: (v) =>
+                      (v == null || int.tryParse(v) == null || int.parse(v) < 0)
+                      ? 'Enter 0 or positive'
+                      : null,
+                  onSaved: (v) => quantity = int.parse(v ?? '0'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  formKey.currentState?.save();
+                  final prov = Provider.of<StockProvider>(
+                    outerContext,
+                    listen: false,
+                  );
+                  final messenger = ScaffoldMessenger.of(outerContext);
+                  final dialogNavigator = Navigator.of(dialogCtx);
+                  await prov.addItem(name, quantity);
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('Added $name')),
+                  );
+                  dialogNavigator.pop();
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<StockProvider>(context);
@@ -153,78 +220,142 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: prov.items.isEmpty
-          ? const Center(
-              child: Text('No items yet. Add items with the + button.'),
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.inventory_2_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('No items yet.', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 8),
+                  ElevatedButton.icon(
+                    onPressed: () => _openAddDialog(context),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add your first item'),
+                  ),
+                ],
+              ),
             )
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Search items',
+          : RefreshIndicator(
+              onRefresh: prov.loadAll,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Search items',
+                      ),
+                      onChanged: (v) => setState(() => _query = v),
                     ),
-                    onChanged: (v) => setState(() => _query = v),
                   ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filtered.length,
-                    itemBuilder: (_, i) {
-                      final item = filtered[i];
-                      return ListTile(
-                        title: Text(item.name),
-                        subtitle: GestureDetector(
-                          onTap: () => _showSetQuantityDialog(
-                            context,
-                            item.id!,
-                            item.quantity,
-                          ),
-                          child: Text(
-                            'Quantity: ${item.quantity} — tap to edit',
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onLongPress: () => _showAdjustDialog(
-                                context,
-                                item.id!,
-                                'Stock Out',
-                                false,
-                              ),
-                              child: IconButton(
-                                onPressed: () => prov.stockOut(item.id!, 1),
-                                icon: const Icon(
-                                  Icons.remove,
-                                  color: Colors.red,
-                                ),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(8),
+                      itemCount: filtered.length,
+                      itemBuilder: (_, i) {
+                        final item = filtered[i];
+                        final last = prov.lastTransactionFor(item.id!);
+                        final messenger = ScaffoldMessenger.of(context);
+                        return Card(
+                          elevation: 2,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: item.quantity > 0
+                                  ? Colors.green.shade700
+                                  : Colors.grey.shade400,
+                              child: Text(
+                                item.quantity.toString(),
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                            GestureDetector(
-                              onLongPress: () => _showAdjustDialog(
-                                context,
-                                item.id!,
-                                'Stock In',
-                                true,
-                              ),
-                              child: IconButton(
-                                onPressed: () => prov.stockIn(item.id!, 1),
-                                icon: const Icon(
-                                  Icons.add,
-                                  color: Colors.green,
-                                ),
+                            title: Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    },
+                            subtitle: last == null
+                                ? const Text('No transactions yet')
+                                : Text(
+                                    '${last.delta > 0 ? '+' : ''}${last.delta} · ${DateTime.fromMillisecondsSinceEpoch(last.timestamp).toLocal()}${last.note != null ? ' · ${last.note}' : ''}',
+                                  ),
+                            onTap: () => _showSetQuantityDialog(
+                              context,
+                              item.id!,
+                              item.quantity,
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  tooltip: 'Remove 1',
+                                  onPressed: () async {
+                                    final provLocal = prov;
+                                    final messengerLocal = messenger;
+                                    await provLocal.stockOut(item.id!, 1);
+                                    messengerLocal.showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Removed 1 from ${item.name}',
+                                        ),
+                                        action: SnackBarAction(
+                                          label: 'Undo',
+                                          onPressed: () => provLocal.stockIn(
+                                            item.id!,
+                                            1,
+                                            'Undo',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.remove,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Add 1',
+                                  onPressed: () async {
+                                    final provLocal = prov;
+                                    final messengerLocal = messenger;
+                                    await provLocal.stockIn(item.id!, 1);
+                                    messengerLocal.showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Added 1 to ${item.name}',
+                                        ),
+                                        action: SnackBarAction(
+                                          label: 'Undo',
+                                          onPressed: () => provLocal.stockOut(
+                                            item.id!,
+                                            1,
+                                            'Undo',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.add,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
