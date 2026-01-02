@@ -140,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final formKey = GlobalKey<FormState>();
         String name = '';
         int quantity = 0;
+        String? brand;
         return AlertDialog(
           title: const Text('Add Item'),
           content: Form(
@@ -152,6 +153,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? 'Enter name' : null,
                   onSaved: (v) => name = v!.trim(),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Brand (optional)',
+                  ),
+                  onSaved: (v) =>
+                      brand = v?.trim().isEmpty ?? true ? null : v?.trim(),
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
@@ -183,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                   final messenger = ScaffoldMessenger.of(outerContext);
                   final dialogNavigator = Navigator.of(dialogCtx);
-                  await prov.addItem(name, quantity);
+                  await prov.addItem(name, quantity, brand);
                   if (!mounted) return;
                   messenger.showSnackBar(
                     SnackBar(content: Text('Added $name')),
@@ -280,11 +288,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            subtitle: last == null
-                                ? const Text('No transactions yet')
-                                : Text(
-                                    '${last.delta > 0 ? '+' : ''}${last.delta} · ${DateTime.fromMillisecondsSinceEpoch(last.timestamp).toLocal()}${last.note != null ? ' · ${last.note}' : ''}',
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (item.brand != null &&
+                                    item.brand!.isNotEmpty)
+                                  Text(
+                                    item.brand!,
+                                    style: const TextStyle(fontSize: 12),
                                   ),
+                                last == null
+                                    ? const Text('No transactions yet')
+                                    : Text(
+                                        '${last.delta > 0 ? '+' : ''}${last.delta} · ${DateTime.fromMillisecondsSinceEpoch(last.timestamp).toLocal()}${last.note != null ? ' · ${last.note}' : ''}',
+                                      ),
+                              ],
+                            ),
                             onTap: () => _showSetQuantityDialog(
                               context,
                               item.id!,
@@ -362,6 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final formKey = GlobalKey<FormState>();
           String name = '';
           int quantity = 0;
+          String? brand;
           await showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -376,6 +397,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Enter name' : null,
                       onSaved: (v) => name = v!.trim(),
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Brand (optional)',
+                      ),
+                      onSaved: (v) =>
+                          brand = v?.trim().isEmpty ?? true ? null : v?.trim(),
                     ),
                     TextFormField(
                       decoration: const InputDecoration(
@@ -408,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         listen: false,
                       );
-                      await prov.addItem(name, quantity);
+                      await prov.addItem(name, quantity, brand);
                       if (!mounted) return;
                       navigator.pop();
                     }

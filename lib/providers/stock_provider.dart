@@ -14,8 +14,8 @@ class StockProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addItem(String name, int quantity) async {
-    final item = StockItem(name: name, quantity: quantity);
+  Future<void> addItem(String name, int quantity, [String? brand]) async {
+    final item = StockItem(name: name, quantity: quantity, brand: brand);
     final id = await _db.insertItem(item);
     item.id = id;
     items.add(item);

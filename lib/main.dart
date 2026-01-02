@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       create: (_) => StockProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Skystoc',
+        title: 'Skystock',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
           useMaterial3: true,

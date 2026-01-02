@@ -14,7 +14,12 @@ class DatabaseService {
     if (_db != null) return _db!;
     final databasesPath = await getDatabasesPath();
     final path = join(databasesPath, 'skystoc.db');
-    _db = await openDatabase(path, version: 1, onCreate: _onCreate);
+    _db = await openDatabase(
+      path,
+      version: 2,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
     return _db!;
   }
 
@@ -23,7 +28,8 @@ class DatabaseService {
       CREATE TABLE items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        quantity INTEGER NOT NULL
+        quantity INTEGER NOT NULL,
+        brand TEXT
       )
     ''');
     await db.execute('''
@@ -36,6 +42,12 @@ class DatabaseService {
         FOREIGN KEY(item_id) REFERENCES items(id)
       )
     ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE items ADD COLUMN brand TEXT');
+    }
   }
 
   Future<int> insertItem(StockItem item) async {

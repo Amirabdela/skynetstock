@@ -13,6 +13,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final _formKey = GlobalKey<FormState>();
   String name = '';
   int quantity = 0;
+  String? brand;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +30,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Enter name' : null,
                 onSaved: (v) => name = v!.trim(),
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Brand (optional)',
+                ),
+                onSaved: (v) =>
+                    brand = v?.trim().isEmpty ?? true ? null : v?.trim(),
               ),
               TextFormField(
                 decoration: const InputDecoration(
@@ -52,7 +60,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       context,
                       listen: false,
                     );
-                    await prov.addItem(name, quantity);
+                    await prov.addItem(name, quantity, brand);
                     if (!mounted) return;
                     navigator.pop();
                   }
