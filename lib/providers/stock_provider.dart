@@ -14,8 +14,18 @@ class StockProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addItem(String name, int quantity, [String? brand]) async {
-    final item = StockItem(name: name, quantity: quantity, brand: brand);
+  Future<void> addItem(
+    String name,
+    int quantity, [
+    String? brand,
+    int threshold = 0,
+  ]) async {
+    final item = StockItem(
+      name: name,
+      quantity: quantity,
+      brand: brand,
+      threshold: threshold,
+    );
     final id = await _db.insertItem(item);
     item.id = id;
     items.add(item);
@@ -30,6 +40,29 @@ class StockProvider extends ChangeNotifier {
       transactions.insert(0, t);
     }
     notifyListeners();
+  }
+
+  Future<void> updateItem(StockItem item) async {
+    await _db.updateItem(item);
+    final idx = items.indexWhere((i) => i.id == item.id);
+    if (idx != -1) items[idx] = item;
+    notifyListeners();
+  }
+
+  Future<void> deleteItem(int itemId) async {
+    await _db.deleteItem(itemId);
+    items.removeWhere((i) => i.id == itemId);
+    transactions.removeWhere((t) => t.itemId == itemId);
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> exportData() async {
+    return await _db.exportData();
+  }
+
+  Future<void> importData(Map<String, dynamic> data) async {
+    await _db.importData(data);
+    await loadAll();
   }
 
   Future<void> _applyTransaction(int itemId, int delta, String? note) async {

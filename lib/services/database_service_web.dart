@@ -70,6 +70,16 @@ class DatabaseService {
     return id;
   }
 
+  Future<int> deleteItem(int id) async {
+    _itemsCache = _loadItems();
+    _itemsCache.removeWhere((e) => e.id == id);
+    _saveItems();
+    _txCache = _loadTx();
+    _txCache.removeWhere((t) => t.itemId == id);
+    _saveTx();
+    return 1;
+  }
+
   Future<List<StockItem>> getItems() async {
     _itemsCache = _loadItems();
     _itemsCache.sort((a, b) => a.name.compareTo(b.name));
@@ -82,6 +92,28 @@ class DatabaseService {
     if (idx != -1) _itemsCache[idx] = item;
     _saveItems();
     return 1;
+  }
+
+  Future<Map<String, dynamic>> exportData() async {
+    _itemsCache = _loadItems();
+    _txCache = _loadTx();
+    return {
+      'items': _itemsCache.map((e) => e.toMap()).toList(),
+      'transactions': _txCache.map((e) => e.toMap()).toList(),
+    };
+  }
+
+  Future<void> importData(Map<String, dynamic> data) async {
+    final items = (data['items'] as List).cast<Map<String, dynamic>>();
+    final txs = (data['transactions'] as List).cast<Map<String, dynamic>>();
+    _itemsCache = items
+        .map((e) => StockItem.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    _txCache = txs
+        .map((e) => StockTransaction.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    _saveItems();
+    _saveTx();
   }
 
   Future<int> insertTransaction(StockTransaction t) async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
-// import 'add_item_screen.dart';
+import '../models/stock_item.dart';
 import 'transaction_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _query = '';
+
   @override
   void initState() {
     super.initState();
@@ -132,6 +133,212 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _showEditDialog(BuildContext ctx, StockItem item) async {
+    final formKey = GlobalKey<FormState>();
+    String name = item.name;
+    String? brand = item.brand;
+    int threshold = item.threshold;
+    await showDialog<void>(
+      context: ctx,
+      builder: (_) => AlertDialog(
+        title: const Text('Edit Item'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: name,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Enter name' : null,
+                onSaved: (v) => name = v!.trim(),
+              ),
+              TextFormField(
+                initialValue: brand,
+                decoration: const InputDecoration(
+                  labelText: 'Brand (optional)',
+                ),
+                onSaved: (v) =>
+                    brand = v?.trim().isEmpty ?? true ? null : v?.trim(),
+              ),
+              TextFormField(
+                initialValue: threshold.toString(),
+                decoration: const InputDecoration(
+                  labelText: 'Reorder threshold (optional)',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (v) =>
+                    (v == null || int.tryParse(v) == null || int.parse(v) < 0)
+                    ? 'Enter 0 or positive'
+                    : null,
+                onSaved: (v) => threshold = int.parse(v ?? '0'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState?.validate() ?? false) {
+                formKey.currentState?.save();
+                final prov = Provider.of<StockProvider>(ctx, listen: false);
+                final updated = StockItem(
+                  id: item.id,
+                  name: name,
+                  quantity: item.quantity,
+                  brand: brand,
+                  threshold: threshold,
+                );
+                await prov.updateItem(updated);
+                if (!mounted) return;
+                Navigator.of(ctx).pop();
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext ctx, int itemId, String name) async {
+    final ok = await showDialog<bool>(
+      context: ctx,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete item'),
+        content: Text('Delete "$name" and its transactions?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await Provider.of<StockProvider>(ctx, listen: false).deleteItem(itemId);
+    }
+  }
+
+  Future<void> _seedSampleData() async {
+    final prov = Provider.of<StockProvider>(context, listen: false);
+    final samples = <Map<String, dynamic>>[
+      {'name': 'Hammer', 'brand': 'Acme', 'quantity': 12, 'threshold': 3},
+      {
+        'name': 'Screwdriver',
+        'brand': 'BoltCorp',
+        'quantity': 25,
+        'threshold': 5,
+      },
+      {'name': 'Wrench', 'brand': 'ToolWorks', 'quantity': 8, 'threshold': 2},
+      {'name': 'Pliers', 'brand': 'GripIt', 'quantity': 15, 'threshold': 4},
+      {
+        'name': 'Tape Measure',
+        'brand': 'MeasurePro',
+        'quantity': 30,
+        'threshold': 10,
+      },
+      {'name': 'Level', 'brand': 'TrueLine', 'quantity': 7, 'threshold': 2},
+      {
+        'name': 'Drill Bit Set',
+        'brand': 'DrillMaster',
+        'quantity': 20,
+        'threshold': 5,
+      },
+      {
+        'name': 'Circular Saw',
+        'brand': 'CutRight',
+        'quantity': 5,
+        'threshold': 1,
+      },
+      {
+        'name': 'Nails Box',
+        'brand': 'FastenIt',
+        'quantity': 200,
+        'threshold': 50,
+      },
+      {
+        'name': 'Screws Box',
+        'brand': 'FastenIt',
+        'quantity': 500,
+        'threshold': 100,
+      },
+      {
+        'name': 'Sandpaper Pack',
+        'brand': 'SmoothFinish',
+        'quantity': 40,
+        'threshold': 10,
+      },
+      {
+        'name': 'Paint Brush',
+        'brand': 'BrushCo',
+        'quantity': 60,
+        'threshold': 15,
+      },
+      {
+        'name': 'Paint Can (1L)',
+        'brand': 'ColorMax',
+        'quantity': 18,
+        'threshold': 5,
+      },
+      {
+        'name': 'Gloves',
+        'brand': 'SafeHands',
+        'quantity': 120,
+        'threshold': 20,
+      },
+      {
+        'name': 'Safety Glasses',
+        'brand': 'ClearView',
+        'quantity': 35,
+        'threshold': 5,
+      },
+      {
+        'name': 'Utility Knife',
+        'brand': 'CutPro',
+        'quantity': 22,
+        'threshold': 4,
+      },
+      {
+        'name': 'Extension Cord',
+        'brand': 'PowerLine',
+        'quantity': 14,
+        'threshold': 3,
+      },
+      {'name': 'Workbench', 'brand': 'BuildIt', 'quantity': 3, 'threshold': 1},
+      {'name': 'Ladder', 'brand': 'ReachHigh', 'quantity': 6, 'threshold': 1},
+      {
+        'name': 'Flashlight',
+        'brand': 'BrightLite',
+        'quantity': 45,
+        'threshold': 10,
+      },
+    ];
+
+    for (final s in samples) {
+      await prov.addItem(
+        s['name'] as String,
+        s['quantity'] as int,
+        s['brand'] as String?,
+        s['threshold'] as int,
+      );
+    }
+    await prov.loadAll();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Inserted ${samples.length} sample items')),
+    );
+  }
+
   void _openAddDialog(BuildContext context) {
     final outerContext = context;
     showDialog(
@@ -141,6 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
         String name = '';
         int quantity = 0;
         String? brand;
+        int threshold = 0;
         return AlertDialog(
           title: const Text('Add Item'),
           content: Form(
@@ -173,6 +381,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       : null,
                   onSaved: (v) => quantity = int.parse(v ?? '0'),
                 ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Reorder threshold (optional)',
+                  ),
+                  keyboardType: TextInputType.number,
+                  initialValue: '0',
+                  validator: (v) =>
+                      (v == null || int.tryParse(v) == null || int.parse(v) < 0)
+                      ? 'Enter 0 or positive'
+                      : null,
+                  onSaved: (v) => threshold = int.parse(v ?? '0'),
+                ),
               ],
             ),
           ),
@@ -190,13 +410,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     listen: false,
                   );
                   final messenger = ScaffoldMessenger.of(outerContext);
-                  final dialogNavigator = Navigator.of(dialogCtx);
-                  await prov.addItem(name, quantity, brand);
+                  await prov.addItem(name, quantity, brand, threshold);
                   if (!mounted) return;
                   messenger.showSnackBar(
                     SnackBar(content: Text('Added $name')),
                   );
-                  dialogNavigator.pop();
+                  Navigator.of(dialogCtx).pop();
                 }
               },
               child: const Text('Add'),
@@ -215,8 +434,44 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Skystoc'),
+        title: Row(
+          children: [
+            Image.asset(
+              'lib/screens/image-removebg-preview (2).png',
+              height: 32,
+            ),
+            const SizedBox(width: 8),
+            const Text('Skystoc'),
+          ],
+        ),
         actions: [
+          IconButton(
+            tooltip: 'Seed sample items',
+            icon: const Icon(Icons.cloud_download),
+            onPressed: () async {
+              final ok = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Seed data'),
+                  content: const Text(
+                    'Insert 20 sample items into the database?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Insert'),
+                    ),
+                  ],
+                ),
+              );
+              if (ok != true) return;
+              await _seedSampleData();
+            },
+          ),
           IconButton(
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
@@ -298,6 +553,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     item.brand!,
                                     style: const TextStyle(fontSize: 12),
                                   ),
+                                if (item.threshold > 0 &&
+                                    item.quantity <= item.threshold)
+                                  Text(
+                                    'Low stock',
+                                    style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 last == null
                                     ? const Text('No transactions yet')
                                     : Text(
@@ -367,6 +631,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Colors.green,
                                   ),
                                 ),
+                                PopupMenuButton<String>(
+                                  onSelected: (v) {
+                                    if (v == 'edit')
+                                      _showEditDialog(context, item);
+                                    if (v == 'delete')
+                                      _confirmDelete(
+                                        context,
+                                        item.id!,
+                                        item.name,
+                                      );
+                                  },
+                                  itemBuilder: (_) => [
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: Text('Edit'),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: Text('Delete'),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -383,6 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
           String name = '';
           int quantity = 0;
           String? brand;
+          int threshold = 0;
           await showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -419,6 +706,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           : null,
                       onSaved: (v) => quantity = int.parse(v ?? '0'),
                     ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Reorder threshold (optional)',
+                      ),
+                      keyboardType: TextInputType.number,
+                      initialValue: '0',
+                      validator: (v) =>
+                          (v == null ||
+                              int.tryParse(v) == null ||
+                              int.parse(v) < 0)
+                          ? 'Enter 0 or positive'
+                          : null,
+                      onSaved: (v) => threshold = int.parse(v ?? '0'),
+                    ),
                   ],
                 ),
               ),
@@ -436,7 +737,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         listen: false,
                       );
-                      await prov.addItem(name, quantity, brand);
+                      await prov.addItem(name, quantity, brand, threshold);
                       if (!mounted) return;
                       navigator.pop();
                     }

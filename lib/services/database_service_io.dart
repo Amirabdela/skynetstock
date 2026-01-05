@@ -16,7 +16,7 @@ class DatabaseService {
     final path = join(databasesPath, 'skystoc.db');
     _db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -29,7 +29,8 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         quantity INTEGER NOT NULL,
-        brand TEXT
+        brand TEXT,
+        threshold INTEGER NOT NULL DEFAULT 0
       )
     ''');
     await db.execute('''
@@ -48,6 +49,46 @@ class DatabaseService {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE items ADD COLUMN brand TEXT');
     }
+    if (oldVersion < 3) {
+      await db.execute(
+        'ALTER TABLE items ADD COLUMN threshold INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+  }
+
+  Future<int> deleteItem(int id) async {
+    final database = await db;
+    await database.delete(
+      'transactions',
+      where: 'item_id = ?',
+      whereArgs: [id],
+    );
+    return await database.delete('items', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<Map<String, dynamic>> exportData() async {
+    final database = await db;
+    final itemsRows = await database.query('items');
+    final txRows = await database.query('transactions');
+    return {'items': itemsRows, 'transactions': txRows};
+  }
+
+  Future<void> importData(Map<String, dynamic> data) async {
+    final database = await db;
+    await database.transaction((txn) async {
+      await txn.delete('transactions');
+      await txn.delete('items');
+      final items = (data['items'] as List).cast<Map<String, dynamic>>();
+      for (final it in items) {
+        final map = Map<String, dynamic>.from(it);
+        await txn.insert('items', map);
+      }
+      final txs = (data['transactions'] as List).cast<Map<String, dynamic>>();
+      for (final t in txs) {
+        final map = Map<String, dynamic>.from(t);
+        await txn.insert('transactions', map);
+      }
+    });
   }
 
   Future<int> insertItem(StockItem item) async {

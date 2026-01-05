@@ -18,8 +18,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Skystock',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),
           useMaterial3: true,
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.blue.shade900,
+            foregroundColor: Colors.white,
+          ),
           snackBarTheme: const SnackBarThemeData(
             behavior: SnackBarBehavior.floating,
           ),

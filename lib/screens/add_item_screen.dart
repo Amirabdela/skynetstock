@@ -14,6 +14,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   String name = '';
   int quantity = 0;
   String? brand;
+  int threshold = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +51,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     : null,
                 onSaved: (v) => quantity = int.parse(v ?? '0'),
               ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Reorder threshold (optional)',
+                ),
+                keyboardType: TextInputType.number,
+                initialValue: '0',
+                validator: (v) =>
+                    (v == null || int.tryParse(v) == null || int.parse(v) < 0)
+                    ? 'Enter 0 or positive'
+                    : null,
+                onSaved: (v) => threshold = int.parse(v ?? '0'),
+              ),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () async {
@@ -60,7 +73,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       context,
                       listen: false,
                     );
-                    await prov.addItem(name, quantity, brand);
+                    await prov.addItem(name, quantity, brand, threshold);
                     if (!mounted) return;
                     navigator.pop();
                   }
