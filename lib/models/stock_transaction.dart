@@ -1,7 +1,7 @@
 class StockTransaction {
   int? id;
   int itemId;
-  int delta; // positive for in, negative for out
+  int delta; 
   int timestamp;
   String? note;
 
