@@ -16,12 +16,12 @@ class MyApp extends StatelessWidget {
       create: (_) => StockProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Skystock',
+        title: 'SkyStock',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo.shade700),
           useMaterial3: true,
           appBarTheme: AppBarTheme(
-            backgroundColor: Colors.blue.shade900,
+            backgroundColor: Colors.indigo.shade700,
             foregroundColor: Colors.white,
           ),
           snackBarTheme: const SnackBarThemeData(

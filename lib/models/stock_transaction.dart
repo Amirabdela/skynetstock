@@ -1,7 +1,7 @@
 class StockTransaction {
   int? id;
   int itemId;
-  int delta; 
+  int delta;
   int timestamp;
   String? note;
 
@@ -12,6 +12,30 @@ class StockTransaction {
     required this.timestamp,
     this.note,
   });
+
+  DateTime get dateTime =>
+      DateTime.fromMillisecondsSinceEpoch(timestamp).toLocal();
+
+  factory StockTransaction.fromJson(Map<String, dynamic> json) =>
+      StockTransaction.fromMap(json);
+
+  Map<String, dynamic> toJson() => toMap();
+
+  StockTransaction copyWith({
+    int? id,
+    int? itemId,
+    int? delta,
+    int? timestamp,
+    String? note,
+  }) {
+    return StockTransaction(
+      id: id ?? this.id,
+      itemId: itemId ?? this.itemId,
+      delta: delta ?? this.delta,
+      timestamp: timestamp ?? this.timestamp,
+      note: note ?? this.note,
+    );
+  }
 
   factory StockTransaction.fromMap(Map<String, dynamic> m) => StockTransaction(
     id: m['id'] as int?,
@@ -28,4 +52,8 @@ class StockTransaction {
     'timestamp': timestamp,
     'note': note,
   };
+
+  @override
+  String toString() =>
+      'StockTransaction(id: $id, itemId: $itemId, delta: $delta, timestamp: $timestamp, note: $note)';
 }

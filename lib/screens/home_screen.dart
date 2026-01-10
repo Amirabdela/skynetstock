@@ -14,6 +14,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _query = '';
 
+  String _two(int n) => n.toString().padLeft(2, '0');
+
+  String _fmtTimestamp(int ts) {
+    final d = DateTime.fromMillisecondsSinceEpoch(ts).toLocal();
+    return '${d.year}-${_two(d.month)}-${_two(d.day)} ${_two(d.hour)}:${_two(d.minute)}';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -436,12 +443,13 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset(
-              'lib/screens/image-removebg-preview (2).png',
-              height: 32,
+            const Icon(
+              Icons.inventory_2_outlined,
+              size: 28,
+              semanticLabel: 'Inventory',
             ),
             const SizedBox(width: 8),
-            const Text('Skystoc'),
+            const Text('SkyStock'),
           ],
         ),
         actions: [
@@ -493,7 +501,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.grey,
                   ),
                   const SizedBox(height: 12),
-                  const Text('No items yet.', style: TextStyle(fontSize: 18)),
+                  const Text(
+                    'No items yet — add one to get started.',
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () => _openAddDialog(context),
@@ -565,7 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 last == null
                                     ? const Text('No transactions yet')
                                     : Text(
-                                        '${last.delta > 0 ? '+' : ''}${last.delta} · ${DateTime.fromMillisecondsSinceEpoch(last.timestamp).toLocal()}${last.note != null ? ' · ${last.note}' : ''}',
+                                        '${last.delta > 0 ? '+' : ''}${last.delta} · ${_fmtTimestamp(last.timestamp)}${last.note != null ? ' · ${last.note}' : ''}',
                                       ),
                               ],
                             ),
@@ -664,6 +676,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
       floatingActionButton: FloatingActionButton(
+        tooltip: 'Add item',
         onPressed: () async {
           final formKey = GlobalKey<FormState>();
           String name = '';
@@ -748,7 +761,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, semanticLabel: 'Add item'),
       ),
     );
   }
