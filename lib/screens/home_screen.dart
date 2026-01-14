@@ -24,8 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<StockProvider>(context, listen: false).loadAll();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prov = Provider.of<StockProvider>(context, listen: false);
+      final seeded = await prov.seedIfEmpty();
+      if (seeded && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Inserted sample items')));
+      }
     });
   }
 
@@ -38,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final formKey = GlobalKey<FormState>();
     int amount = 0;
     String? note;
-    await showDialog(
+    await showDialog<void>(
       context: ctx,
       builder: (_) => AlertDialog(
         title: Text(title),
@@ -56,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     : null,
                 onSaved: (v) => amount = int.parse(v ?? '0'),
               ),
+              const SizedBox(height: 8),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Note (optional)'),
                 onSaved: (v) => note = v,
@@ -194,6 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (formKey.currentState?.validate() ?? false) {
                 formKey.currentState?.save();
                 final prov = Provider.of<StockProvider>(ctx, listen: false);
+                final navigator = Navigator.of(ctx);
                 final updated = StockItem(
                   id: item.id,
                   name: name,
@@ -203,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
                 await prov.updateItem(updated);
                 if (!mounted) return;
-                Navigator.of(ctx).pop();
+                navigator.pop();
               }
             },
             child: const Text('Save'),
@@ -214,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _confirmDelete(BuildContext ctx, int itemId, String name) async {
+    final prov = Provider.of<StockProvider>(ctx, listen: false);
     final ok = await showDialog<bool>(
       context: ctx,
       builder: (_) => AlertDialog(
@@ -232,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     if (ok == true) {
-      await Provider.of<StockProvider>(ctx, listen: false).deleteItem(itemId);
+      await prov.deleteItem(itemId);
     }
   }
 
@@ -417,12 +424,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     listen: false,
                   );
                   final messenger = ScaffoldMessenger.of(outerContext);
+                  final navigator = Navigator.of(dialogCtx);
                   await prov.addItem(name, quantity, brand, threshold);
                   if (!mounted) return;
                   messenger.showSnackBar(
                     SnackBar(content: Text('Added $name')),
                   );
-                  Navigator.of(dialogCtx).pop();
+                  navigator.pop();
                 }
               },
               child: const Text('Add'),
@@ -441,54 +449,188 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 72,
         title: Row(
           children: [
-            const Icon(
-              Icons.inventory_2_outlined,
-              size: 28,
-              semanticLabel: 'Inventory',
+            Wrap(
+              spacing: 6,
+              children: [
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Overview',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Operations',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Products',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Reporting',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Configuration',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            const Text('SkyStock'),
+            const Spacer(),
+            Row(
+              children: [
+                Image.asset(
+                  'lib/screens/image-removebg-preview (2).png',
+                  height: 28,
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Skynet Stock',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                ),
+              ],
+            ),
           ],
         ),
         actions: [
           IconButton(
-            tooltip: 'Seed sample items',
-            icon: const Icon(Icons.cloud_download),
-            onPressed: () async {
-              final ok = await showDialog<bool>(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text('Seed data'),
-                  content: const Text(
-                    'Insert 20 sample items into the database?',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('Cancel'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Insert'),
-                    ),
-                  ],
-                ),
+            tooltip: 'Messages',
+            icon: const Icon(Icons.email_outlined),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Messages not implemented')),
               );
-              if (ok != true) return;
-              await _seedSampleData();
             },
           ),
           IconButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const TransactionHistoryScreen(),
-              ),
-            ),
-            icon: const Icon(Icons.history),
+            tooltip: 'Notifications',
+            icon: const Icon(Icons.notifications_none),
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('No notifications')));
+            },
+          ),
+          IconButton(
+            tooltip: 'Account',
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () => Navigator.of(context).pushNamed('/account'),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (v) async {
+              // Capture context-dependent objects before any await
+              final messenger = ScaffoldMessenger.of(context);
+              final navigator = Navigator.of(context);
+              
+              if (v == 'seed') {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('Seed data'),
+                    content: const Text(
+                      'Insert 20 sample items into the database?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => navigator.pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => navigator.pop(true),
+                        child: const Text('Insert'),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok == true) await _seedSampleData();
+              }
+              if (v == 'export') {
+                final data = await prov.exportData();
+                final count = (data['items'] as List).length;
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Exported $count items (clipboard not implemented)',
+                    ),
+                  ),
+                );
+              }
+              if (v == 'history') {
+                navigator.push(
+                  MaterialPageRoute(
+                    builder: (_) => const TransactionHistoryScreen(),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'history', child: Text('History')),
+              PopupMenuItem(value: 'seed', child: Text('Seed sample items')),
+              PopupMenuItem(value: 'export', child: Text('Export data')),
+            ],
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('New action')));
+                  },
+                  icon: const Icon(Icons.fiber_new),
+                  label: const Text('New'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Order action')),
+                    );
+                  },
+                  icon: const Icon(Icons.shopping_cart_outlined),
+                  label: const Text('Order'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: () => _openAddDialog(context),
+                  icon: const Icon(Icons.add_box_outlined),
+                  label: const Text('Add Stock'),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => Navigator.of(context).pushNamed('/settings'),
+                  icon: const Icon(Icons.settings, color: Colors.white),
+                  label: const Text(
+                    'Settings',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: prov.items.isEmpty
           ? Center(
@@ -519,6 +661,58 @@ class _HomeScreenState extends State<HomeScreen> {
               onRefresh: prov.loadAll,
               child: Column(
                 children: [
+                  // Summary row
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Inventory',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '${prov.items.length} items • ${prov.items.fold<int>(0, (p, e) => p + e.quantity)} units',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.redAccent,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  '${prov.items.where((i) => i.threshold > 0 && i.quantity <= i.threshold).length} low',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -538,47 +732,67 @@ class _HomeScreenState extends State<HomeScreen> {
                         final last = prov.lastTransactionFor(item.id!);
                         final messenger = ScaffoldMessenger.of(context);
                         return Card(
-                          elevation: 2,
                           child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             leading: CircleAvatar(
+                              radius: 26,
                               backgroundColor: item.quantity > 0
                                   ? Colors.green.shade700
                                   : Colors.grey.shade400,
-                              child: Text(
-                                item.quantity.toString(),
-                                style: const TextStyle(color: Colors.white),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    item.quantity.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             title: Text(
                               item.name,
                               style: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (item.brand != null &&
-                                    item.brand!.isNotEmpty)
-                                  Text(
-                                    item.brand!,
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                if (item.threshold > 0 &&
-                                    item.quantity <= item.threshold)
-                                  Text(
-                                    'Low stock',
-                                    style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                last == null
-                                    ? const Text('No transactions yet')
-                                    : Text(
-                                        '${last.delta > 0 ? '+' : ''}${last.delta} · ${_fmtTimestamp(last.timestamp)}${last.note != null ? ' · ${last.note}' : ''}',
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  children: [
+                                    if (item.brand != null &&
+                                        item.brand!.isNotEmpty)
+                                      Chip(
+                                        label: Text(item.brand!),
+                                        visualDensity: VisualDensity.compact,
                                       ),
+                                    if (item.threshold > 0 &&
+                                        item.quantity <= item.threshold)
+                                      Chip(
+                                        label: const Text('Low stock'),
+                                        backgroundColor: Colors.red.shade100,
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  last == null
+                                      ? 'No transactions yet'
+                                      : '${last.delta > 0 ? '+' : ''}${last.delta} · ${_fmtTimestamp(last.timestamp)}${last.note != null ? ' · ${last.note}' : ''}',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade700,
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ],
                             ),
                             onTap: () => _showSetQuantityDialog(
@@ -645,21 +859,47 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 PopupMenuButton<String>(
                                   onSelected: (v) {
-                                    if (v == 'edit')
+                                    if (v == 'stock_in') {
+                                      _showAdjustDialog(
+                                        context,
+                                        item.id!,
+                                        'Stock In',
+                                        true,
+                                      );
+                                    }
+                                    if (v == 'stock_out') {
+                                      _showAdjustDialog(
+                                        context,
+                                        item.id!,
+                                        'Stock Out',
+                                        false,
+                                      );
+                                    }
+                                    if (v == 'edit') {
                                       _showEditDialog(context, item);
-                                    if (v == 'delete')
+                                    }
+                                    if (v == 'delete') {
                                       _confirmDelete(
                                         context,
                                         item.id!,
                                         item.name,
                                       );
+                                    }
                                   },
-                                  itemBuilder: (_) => [
-                                    const PopupMenuItem(
+                                  itemBuilder: (_) => const [
+                                    PopupMenuItem(
+                                      value: 'stock_in',
+                                      child: Text('Stock In...'),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'stock_out',
+                                      child: Text('Stock Out...'),
+                                    ),
+                                    PopupMenuItem(
                                       value: 'edit',
                                       child: Text('Edit'),
                                     ),
-                                    const PopupMenuItem(
+                                    PopupMenuItem(
                                       value: 'delete',
                                       child: Text('Delete'),
                                     ),

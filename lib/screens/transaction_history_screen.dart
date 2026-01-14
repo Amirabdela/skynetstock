@@ -14,7 +14,8 @@ class TransactionHistoryScreen extends StatelessWidget {
       body: prov.transactions.isEmpty
           ? const Center(child: Text('No transactions yet'))
           : ListView.separated(
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              padding: const EdgeInsets.all(12),
               itemCount: prov.transactions.length,
               itemBuilder: (_, i) {
                 final t = prov.transactions[i];
@@ -27,22 +28,29 @@ class TransactionHistoryScreen extends StatelessWidget {
                   ),
                 );
                 final itemName = matched.name;
-                final dt = DateTime.fromMillisecondsSinceEpoch(t.timestamp);
+                final dt = DateTime.fromMillisecondsSinceEpoch(
+                  t.timestamp,
+                ).toLocal();
                 final isIn = t.delta > 0;
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: isIn
-                        ? Colors.green.shade600
-                        : Colors.red.shade600,
-                    child: Icon(
-                      isIn ? Icons.arrow_upward : Icons.arrow_downward,
-                      color: Colors.white,
-                      size: 18,
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: isIn
+                          ? Colors.green.shade600
+                          : Colors.red.shade600,
+                      child: Icon(
+                        isIn ? Icons.arrow_upward : Icons.arrow_downward,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
-                  ),
-                  title: Text('$itemName — ${isIn ? '+' : ''}${t.delta}'),
-                  subtitle: Text(
-                    '${dt.toLocal()}${t.note != null ? ' · ${t.note}' : ''}',
+                    title: Text(
+                      '$itemName — ${isIn ? '+' : ''}${t.delta}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} ${t.note != null ? ' · ${t.note}' : ''}',
+                    ),
                   ),
                 );
               },

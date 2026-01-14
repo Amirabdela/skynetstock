@@ -1,0 +1,132 @@
+Analyzing flutter_application_1...                              
+
+warning - The value of the field '_email' isn't used - lib\screens\account_screen.dart:13:10 - unused_field
+  error - The class '_HomeScreenState' doesn't have an unnamed constructor - lib\screens\home_screen.dart:11:38 - new_with_undefined_constructor_default
+warning - The declaration '<unnamed>' isn't referenced - lib\screens\home_screen.dart:14:7 - unused_element
+  error - Missing concrete implementation of 'abstract class State<T extends StatefulWidget> with Diagnosticable.build' - lib\screens\home_screen.dart:14:7 - non_abstract_class_inherits_abstract_member
+   info - The private field _query could be 'final' - lib\screens\home_screen.dart:15:10 - prefer_final_fields
+warning - The declaration '_fmtTimestamp' isn't referenced - lib\screens\home_screen.dart:19:10 - unused_element
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:31:76 - const_eval_method_invocation
+warning - The declaration '_showAdjustDialog' isn't referenced - lib\screens\home_screen.dart:36:16 - unused_element
+warning - The value of the local variable 'amount' isn't used - lib\screens\home_screen.dart:43:9 - unused_local_variable
+warning - The value of the local variable 'note' isn't used - lib\screens\home_screen.dart:44:13 - unused_local_variable
+  error - This expression has a type of 'void' so its value can't be used - lib\screens\home_screen.dart:77:39 - use_of_void_result
+  error - Expected to find ')' - lib\screens\home_screen.dart:77:45 - expected_token
+  error - Expected to find ']' - lib\screens\home_screen.dart:77:45 - expected_token
+warning - The label 'tooltip' isn't used - lib\screens\home_screen.dart:78:13 - unused_label
+  error - Expected to find ';' - lib\screens\home_screen.dart:78:22 - expected_token
+  error - Expected an identifier - lib\screens\home_screen.dart:78:37 - missing_identifier
+  error - Unexpected text ';' - lib\screens\home_screen.dart:78:37 - unexpected_token
+warning - The label 'icon' isn't used - lib\screens\home_screen.dart:79:13 - unused_label
+  error - Expected to find ';' - lib\screens\home_screen.dart:79:54 - expected_token
+  error - Expected an identifier - lib\screens\home_screen.dart:79:55 - missing_identifier
+  error - Unexpected text ';' - lib\screens\home_screen.dart:79:55 - unexpected_token
+warning - The label 'onPressed' isn't used - lib\screens\home_screen.dart:80:13 - unused_label
+  error - Expected to find ';' - lib\screens\home_screen.dart:80:78 - expected_token
+  error - Expected an identifier - lib\screens\home_screen.dart:80:79 - missing_identifier
+  error - Unexpected text ';' - lib\screens\home_screen.dart:80:79 - unexpected_token
+  error - Expected a class member - lib\screens\home_screen.dart:81:19 - expected_class_member
+  error - Expected an identifier - lib\screens\home_screen.dart:81:24 - missing_identifier
+  error - Methods must have an explicit list of parameters - lib\screens\home_screen.dart:81:24 - missing_method_parameters
+  error - Undefined name 'ctx' - lib\screens\home_screen.dart:83:21 - undefined_identifier
+  error - Undefined name 'itemId' - lib\screens\home_screen.dart:85:30 - undefined_identifier
+  error - Undefined name 'amount' - lib\screens\home_screen.dart:85:38 - undefined_identifier
+  error - Undefined name 'note' - lib\screens\home_screen.dart:85:46 - undefined_identifier
+  error - The name of a constructor must match the name of the enclosing class - lib\screens\home_screen.dart:87:17 - invalid_constructor_name
+   info - Empty constructor bodies should be written using a ';' rather than '{}' - lib\screens\home_screen.dart:87:34 - empty_constructor_bodies
+  error - A function body must be provided - lib\screens\home_screen.dart:87:34 - missing_function_body
+  error - Expected a class member - lib\screens\home_screen.dart:87:34 - expected_class_member
+  error - 'pop' must have a method body because '_HomeScreenState' isn't abstract - lib\screens\home_screen.dart:87:35 - concrete_class_with_abstract_member
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:89:13 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:89:14 - expected_executable
+   info - An uninitialized variable should have an explicit type annotation - lib\screens\home_screen.dart:90:13 - prefer_typing_uninitialized_variables
+  error - Expected to find ';' - lib\screens\home_screen.dart:90:13 - expected_token
+  error - Variables must be declared using the keywords 'const', 'final', 'var' or a type name - lib\screens\home_screen.dart:90:13 - missing_const_final_var_or_type
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:90:18 - expected_executable
+  error - Can't have modifier 'const' here - lib\screens\home_screen.dart:90:20 - extraneous_modifier
+   info - The variable name 'Text' isn't a lowerCamelCase identifier - lib\screens\home_screen.dart:90:26 - non_constant_identifier_names
+  error - Expected an identifier - lib\screens\home_screen.dart:90:31 - missing_identifier
+  error - A function body must be provided - lib\screens\home_screen.dart:90:38 - missing_function_body
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:90:38 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:91:11 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:91:12 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:92:9 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:92:10 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:93:7 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:93:8 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:94:5 - expected_executable
+  error - Unexpected text ';' - lib\screens\home_screen.dart:94:6 - unexpected_token
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:95:3 - expected_executable
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:107:22 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:124:26 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:137:26 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:152:22 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:191:26 - creation_with_non_type
+  error - Undefined name 'mounted' - lib\screens\home_screen.dart:206:22 - undefined_identifier
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\home_screen.dart:207:30 - use_build_context_synchronously
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:210:26 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:221:22 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:226:26 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:230:26 - creation_with_non_type
+   info - Don't use 'BuildContext's across async gaps - lib\screens\home_screen.dart:236:40 - use_build_context_synchronously
+  error - Undefined name 'context' - lib\screens\home_screen.dart:241:45 - undefined_identifier
+  error - Undefined name 'mounted' - lib\screens\home_screen.dart:344:10 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\home_screen.dart:345:26 - undefined_identifier
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:361:24 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:410:28 - creation_with_non_type
+  error - Undefined name 'mounted' - lib\screens\home_screen.dart:422:24 - undefined_identifier
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\home_screen.dart:426:32 - use_build_context_synchronously
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:429:28 - creation_with_non_type
+  error - Undefined name '_query' - lib\screens\home_screen.dart:441:55 - undefined_identifier
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:453:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:460:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:467:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:474:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:481:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:496:23 - creation_with_non_type
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:510:41 - const_eval_method_invocation
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:520:54 - const_eval_method_invocation
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:534:34 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:535:36 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:541:38 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:545:38 - creation_with_non_type
+  error - Undefined name 'mounted' - lib\screens\home_screen.dart:555:22 - undefined_identifier
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\home_screen.dart:556:38 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\home_screen.dart:565:30 - use_build_context_synchronously
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:573:54 - const_eval_method_invocation
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:574:51 - const_eval_method_invocation
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:575:53 - const_eval_method_invocation
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:589:60 - const_eval_method_invocation
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:592:32 - creation_with_non_type
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:598:47 - const_eval_method_invocation
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:602:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:608:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:614:32 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:635:25 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:644:34 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:668:41 - creation_with_non_type
+  error - The function 'setState' isn't defined - lib\screens\home_screen.dart:712:41 - undefined_function
+  error - Undefined name '_query' - lib\screens\home_screen.dart:712:56 - undefined_identifier
+  error - The named parameter 'style' isn't defined - lib\screens\home_screen.dart:739:37 - undefined_named_parameter
+  error - The named parameter 'style' isn't defined - lib\screens\home_screen.dart:749:31 - undefined_named_parameter
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:770:54 - creation_with_non_type
+  error - The function '_fmtTimestamp' isn't defined - lib\screens\home_screen.dart:779:88 - undefined_function
+  error - The named parameter 'style' isn't defined - lib\screens\home_screen.dart:780:35 - undefined_named_parameter
+   info - Statements in an if should be enclosed in a block - lib\screens\home_screen.dart:852:39 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\home_screen.dart:854:39 - curly_braces_in_flow_control_structures
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:863:46 - const_eval_method_invocation
+  error - Methods can't be invoked in constant expressions - lib\screens\home_screen.dart:867:46 - const_eval_method_invocation
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:892:28 - creation_with_non_type
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:945:32 - creation_with_non_type
+  error - Undefined name 'mounted' - lib\screens\home_screen.dart:957:28 - undefined_identifier
+  error - The name 'Text' isn't a class - lib\screens\home_screen.dart:961:32 - creation_with_non_type
+  error - Expected a method, getter, setter or operator declaration - lib\screens\home_screen.dart:971:1 - expected_executable
+warning - The value of the field '_username' isn't used - lib\screens\login_screen.dart:12:10 - unused_field
+warning - The value of the field '_password' isn't used - lib\screens\login_screen.dart:13:10 - unused_field
+  error - The constructor being called isn't a const constructor - lib\screens\login_screen.dart:38:19 - const_with_non_const
+  error - The values in a const list literal must be constants - lib\screens\login_screen.dart:38:19 - non_constant_list_element
+   info - Unnecessary 'const' keyword - lib\screens\login_screen.dart:42:19 - unnecessary_const
+   info - Unnecessary 'const' keyword - lib\screens\login_screen.dart:43:19 - unnecessary_const
+   info - Don't use 'BuildContext's across async gaps - lib\screens\settings_screen.dart:21:36 - use_build_context_synchronously
+
+128 issues found. (ran in 1.6s)

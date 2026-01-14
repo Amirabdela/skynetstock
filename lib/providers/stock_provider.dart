@@ -14,6 +14,77 @@ class StockProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Seed the database with sample items (idempotent when called on empty DB)
+  Future<void> seedSampleData() async {
+    final samples = <Map<String, dynamic>>[
+      {'name': 'Hammer', 'brand': 'Acme', 'quantity': 12, 'threshold': 3},
+      {
+        'name': 'Screwdriver',
+        'brand': 'BoltCorp',
+        'quantity': 25,
+        'threshold': 5,
+      },
+      {'name': 'Wrench', 'brand': 'ToolWorks', 'quantity': 8, 'threshold': 2},
+      {'name': 'Pliers', 'brand': 'GripIt', 'quantity': 15, 'threshold': 4},
+      {
+        'name': 'Tape Measure',
+        'brand': 'MeasurePro',
+        'quantity': 30,
+        'threshold': 10,
+      },
+      {
+        'name': 'Drill Bit Set',
+        'brand': 'DrillMaster',
+        'quantity': 20,
+        'threshold': 5,
+      },
+      {
+        'name': 'Circular Saw',
+        'brand': 'CutRight',
+        'quantity': 5,
+        'threshold': 1,
+      },
+      {
+        'name': 'Nails Box',
+        'brand': 'FastenIt',
+        'quantity': 200,
+        'threshold': 50,
+      },
+      {
+        'name': 'Screws Box',
+        'brand': 'FastenIt',
+        'quantity': 500,
+        'threshold': 100,
+      },
+      {
+        'name': 'Sandpaper Pack',
+        'brand': 'SmoothFinish',
+        'quantity': 40,
+        'threshold': 10,
+      },
+    ];
+    for (final s in samples) {
+      await addItem(
+        s['name'] as String,
+        s['quantity'] as int,
+        s['brand'] as String?,
+        s['threshold'] as int,
+      );
+    }
+    await loadAll();
+  }
+
+  /// If the database is empty, seed it with sample data.
+  /// Returns true if seeding was performed.
+  Future<bool> seedIfEmpty() async {
+    await loadAll();
+    if (items.isEmpty) {
+      await seedSampleData();
+      return true;
+    }
+    return false;
+  }
+
   Future<void> addItem(
     String name,
     int quantity, [

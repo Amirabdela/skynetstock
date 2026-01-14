@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "711184427721",
+    "project_id": "skynet-stationary",
+    "storage_bucket": "skynet-stationary.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711184427721:android:98de4f70a0bc8f8f73fb18",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjnOq1iJ8N7mpwLNNsXhpl-a40gMKnsu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
