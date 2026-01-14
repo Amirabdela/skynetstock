@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'theme/app_theme.dart';
 import 'providers/stock_provider.dart';
+import 'providers/theme_provider.dart';
 import 'services/auth_service.dart';
 import 'services/auth_gate.dart';
 import 'screens/home_screen.dart';
@@ -38,22 +39,29 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => StockProvider()),
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Skynet Stock',
-        theme: AppTheme.lightTheme,
-        home: const AuthGate(),
-        routes: {
-          '/signin': (_) => const SignInScreen(),
-          '/signup': (_) => const SignUpScreen(),
-          '/login': (_) => const SignInScreen(),
-          '/home': (_) => const HomeScreen(),
-          '/account': (_) => const AccountScreen(),
-          '/settings': (_) => const SettingsScreen(),
-          '/messages': (_) => const MessagesScreen(),
-          '/notifications': (_) => const NotificationsScreen(),
-          '/reports': (_) => const ReportsScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Skynet Stock',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
+            home: const AuthGate(),
+            routes: {
+              '/signin': (_) => const SignInScreen(),
+              '/signup': (_) => const SignUpScreen(),
+              '/login': (_) => const SignInScreen(),
+              '/home': (_) => const HomeScreen(),
+              '/account': (_) => const AccountScreen(),
+              '/settings': (_) => const SettingsScreen(),
+              '/messages': (_) => const MessagesScreen(),
+              '/notifications': (_) => const NotificationsScreen(),
+              '/reports': (_) => const ReportsScreen(),
+            },
+          );
         },
       ),
     );

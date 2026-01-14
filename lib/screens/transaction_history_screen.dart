@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
 import '../models/stock_item.dart';
+import '../widgets/gradient_app_bar.dart';
 
 class TransactionHistoryScreen extends StatelessWidget {
   const TransactionHistoryScreen({super.key});
@@ -10,7 +11,7 @@ class TransactionHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final prov = Provider.of<StockProvider>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Transactions')),
+      appBar: const GradientAppBar(title: 'Transactions'),
       body: prov.transactions.isEmpty
           ? const Center(child: Text('No transactions yet'))
           : ListView.separated(

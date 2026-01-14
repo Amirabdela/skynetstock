@@ -396,14 +396,18 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
             ],
           ),
-          child: Image.asset(
-            'lib/screens/image-removebg-preview (2).png',
-            height: 60,
-            width: 60,
-            errorBuilder: (_, __, ___) => Icon(
-              Icons.inventory_2,
-              size: 60,
-              color: Colors.indigo.shade700,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              'lib/screens/image-removebg-preview (2).png',
+              height: 60,
+              width: 60,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.inventory_2,
+                size: 60,
+                color: Colors.indigo.shade700,
+              ),
             ),
           ),
         ),

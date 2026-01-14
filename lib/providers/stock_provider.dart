@@ -17,51 +17,35 @@ class StockProvider extends ChangeNotifier {
   /// Seed the database with sample items (idempotent when called on empty DB)
   Future<void> seedSampleData() async {
     final samples = <Map<String, dynamic>>[
-      {'name': 'Hammer', 'brand': 'Acme', 'quantity': 12, 'threshold': 3},
-      {
-        'name': 'Screwdriver',
-        'brand': 'BoltCorp',
-        'quantity': 25,
-        'threshold': 5,
-      },
-      {'name': 'Wrench', 'brand': 'ToolWorks', 'quantity': 8, 'threshold': 2},
-      {'name': 'Pliers', 'brand': 'GripIt', 'quantity': 15, 'threshold': 4},
-      {
-        'name': 'Tape Measure',
-        'brand': 'MeasurePro',
-        'quantity': 30,
-        'threshold': 10,
-      },
-      {
-        'name': 'Drill Bit Set',
-        'brand': 'DrillMaster',
-        'quantity': 20,
-        'threshold': 5,
-      },
-      {
-        'name': 'Circular Saw',
-        'brand': 'CutRight',
-        'quantity': 5,
-        'threshold': 1,
-      },
-      {
-        'name': 'Nails Box',
-        'brand': 'FastenIt',
-        'quantity': 200,
-        'threshold': 50,
-      },
-      {
-        'name': 'Screws Box',
-        'brand': 'FastenIt',
-        'quantity': 500,
-        'threshold': 100,
-      },
-      {
-        'name': 'Sandpaper Pack',
-        'brand': 'SmoothFinish',
-        'quantity': 40,
-        'threshold': 10,
-      },
+      // Writing instruments
+      {'name': 'Ballpoint Pens (Blue)', 'brand': 'Pilot', 'quantity': 150, 'threshold': 30},
+      {'name': 'Ballpoint Pens (Black)', 'brand': 'Pilot', 'quantity': 120, 'threshold': 25},
+      {'name': 'Pencils HB', 'brand': 'Staedtler', 'quantity': 200, 'threshold': 40},
+      {'name': 'Mechanical Pencils', 'brand': 'Pentel', 'quantity': 45, 'threshold': 10},
+      {'name': 'Highlighters Set', 'brand': 'Stabilo', 'quantity': 60, 'threshold': 15},
+      {'name': 'Whiteboard Markers', 'brand': 'Expo', 'quantity': 35, 'threshold': 10},
+      // Paper products
+      {'name': 'A4 Paper Ream', 'brand': 'Double A', 'quantity': 25, 'threshold': 5},
+      {'name': 'Ruled Notebooks', 'brand': 'Oxford', 'quantity': 80, 'threshold': 20},
+      {'name': 'Graph Notebooks', 'brand': 'Oxford', 'quantity': 40, 'threshold': 10},
+      {'name': 'Sticky Notes', 'brand': 'Post-it', 'quantity': 100, 'threshold': 25},
+      // School supplies
+      {'name': 'Erasers', 'brand': 'Staedtler', 'quantity': 180, 'threshold': 40},
+      {'name': 'Sharpeners', 'brand': 'Maped', 'quantity': 90, 'threshold': 20},
+      {'name': 'Rulers 30cm', 'brand': 'Maped', 'quantity': 55, 'threshold': 15},
+      {'name': 'Geometry Set', 'brand': 'Helix', 'quantity': 30, 'threshold': 8},
+      {'name': 'Scissors', 'brand': 'Fiskars', 'quantity': 40, 'threshold': 10},
+      // Office supplies
+      {'name': 'Staplers', 'brand': 'Kangaro', 'quantity': 20, 'threshold': 5},
+      {'name': 'Staples Box', 'brand': 'Kangaro', 'quantity': 50, 'threshold': 15},
+      {'name': 'Paper Clips Box', 'brand': 'ACCO', 'quantity': 45, 'threshold': 10},
+      {'name': 'Binder Clips', 'brand': 'ACCO', 'quantity': 35, 'threshold': 10},
+      {'name': 'Glue Sticks', 'brand': 'Pritt', 'quantity': 70, 'threshold': 20},
+      {'name': 'Correction Tape', 'brand': 'Tipp-Ex', 'quantity': 55, 'threshold': 15},
+      // Folders & organization
+      {'name': 'Clear Folders', 'brand': 'Deli', 'quantity': 100, 'threshold': 25},
+      {'name': 'Ring Binders', 'brand': 'Bantex', 'quantity': 30, 'threshold': 8},
+      {'name': 'Document Wallets', 'brand': 'Bantex', 'quantity': 45, 'threshold': 12},
     ];
     for (final s in samples) {
       await addItem(
@@ -83,6 +67,12 @@ class StockProvider extends ChangeNotifier {
       return true;
     }
     return false;
+  }
+
+  /// Clear all data and reseed with stationery items
+  Future<void> clearAndReseed() async {
+    await _db.importData({'items': [], 'transactions': []});
+    await seedSampleData();
   }
 
   Future<void> addItem(

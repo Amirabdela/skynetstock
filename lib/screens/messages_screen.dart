@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
+import '../widgets/gradient_app_bar.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -93,9 +94,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Messages'),
+      appBar: GradientAppBar(
+        title: 'Messages',
         actions: [
           IconButton(
             icon: const Icon(Icons.mark_email_read),
@@ -118,11 +121,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.mail_outline, size: 64, color: Colors.grey.shade400),
+                  Icon(Icons.mail_outline, size: 64, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                   const SizedBox(height: 16),
                   Text(
                     'No messages',
-                    style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 18, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                   ),
                 ],
               ),

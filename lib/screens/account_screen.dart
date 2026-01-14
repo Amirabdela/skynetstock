@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../widgets/gradient_app_bar.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -58,9 +59,10 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final user = authService.currentUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      appBar: AppBar(title: const Text('Account')),
+      appBar: const GradientAppBar(title: 'Account'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

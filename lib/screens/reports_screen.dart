@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
+import '../widgets/gradient_app_bar.dart';
+import '../theme/app_theme.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
@@ -8,6 +10,7 @@ class ReportsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<StockProvider>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Calculate statistics
     final totalItems = prov.items.length;
@@ -38,7 +41,7 @@ class ReportsScreen extends StatelessWidget {
     }
     
     return Scaffold(
-      appBar: AppBar(title: const Text('Reports & Analytics')),
+      appBar: const GradientAppBar(title: 'Reports & Analytics'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -257,8 +260,14 @@ class ReportsScreen extends StatelessWidget {
                     runSpacing: 8,
                     children: brandCounts.entries.map((e) {
                       return Chip(
-                        label: Text('${e.key}: ${e.value}'),
-                        backgroundColor: Colors.indigo.shade50,
+                        label: Text(
+                          '${e.key}: ${e.value}',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        backgroundColor: isDark ? AppTheme.darkSurfaceColor : Colors.indigo.shade50,
                       );
                     }).toList(),
                   ),

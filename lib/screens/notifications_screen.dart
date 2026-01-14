@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
 import '../models/stock_item.dart';
+import '../widgets/gradient_app_bar.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -9,6 +10,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<StockProvider>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Generate real notifications based on stock data
     final notifications = <Map<String, dynamic>>[];
@@ -62,8 +64,8 @@ class NotificationsScreen extends StatelessWidget {
     }
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
+      appBar: GradientAppBar(
+        title: 'Notifications',
         actions: [
           if (notifications.isNotEmpty)
             TextButton(
@@ -81,16 +83,16 @@ class NotificationsScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.notifications_off_outlined, size: 64, color: Colors.grey.shade400),
+                  Icon(Icons.notifications_off_outlined, size: 64, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                   const SizedBox(height: 16),
                   Text(
                     'No notifications',
-                    style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 18, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'You\'re all caught up!',
-                    style: TextStyle(color: Colors.grey.shade500),
+                    style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade500),
                   ),
                 ],
               ),

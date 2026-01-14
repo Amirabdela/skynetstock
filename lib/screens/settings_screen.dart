@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
+import '../providers/theme_provider.dart';
 import '../services/auth_service.dart';
+import '../widgets/gradient_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -12,10 +14,12 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final prov = Provider.of<StockProvider>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final user = authService.currentUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: const GradientAppBar(title: 'Settings'),
       body: ListView(
         children: [
           // User info section
@@ -38,13 +42,40 @@ class SettingsScreen extends StatelessWidget {
             const Divider(),
           ],
           
+          // Appearance Section
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              'Appearance',
+              style: TextStyle(
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+            title: const Text('Dark Mode'),
+            subtitle: Text(themeProvider.themeMode == ThemeMode.system 
+                ? 'System default' 
+                : (isDark ? 'On' : 'Off')),
+            trailing: Switch(
+              value: isDark,
+              onChanged: (_) => themeProvider.toggleTheme(),
+            ),
+            onTap: () => themeProvider.toggleTheme(),
+          ),
+          
+          const Divider(),
+          
           // Data Management Section
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               'Data Management',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -68,6 +99,12 @@ class SettingsScreen extends StatelessWidget {
             subtitle: const Text('Delete all items and transactions'),
             onTap: () => _clearAllData(context, prov),
           ),
+          ListTile(
+            leading: Icon(Icons.refresh_rounded, color: Colors.blue.shade400),
+            title: Text('Reset to Stationery Items', style: TextStyle(color: Colors.blue.shade400)),
+            subtitle: const Text('Replace all data with sample stationery'),
+            onTap: () => _resetToStationery(context, prov),
+          ),
           
           const Divider(),
           
@@ -77,7 +114,7 @@ class SettingsScreen extends StatelessWidget {
             child: Text(
               'App',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -159,7 +196,7 @@ class SettingsScreen extends StatelessWidget {
             child: Text(
               'Account',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -362,6 +399,51 @@ class SettingsScreen extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to clear data: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _resetToStationery(BuildContext context, StockProvider prov) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Reset to Stationery Items?'),
+        content: const Text(
+          'This will replace all your current data with sample stationery items '
+          '(pens, pencils, notebooks, erasers, etc.).\n\n'
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && context.mounted) {
+      try {
+        await prov.clearAndReseed();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Data reset to stationery items')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to reset data: $e')),
           );
         }
       }

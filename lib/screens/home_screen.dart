@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final prov = Provider.of<StockProvider>(context);
     final authService = Provider.of<AuthService>(context);
     final user = authService.currentUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     final lowStockCount = prov.items.where(
       (i) => i.threshold > 0 && i.quantity <= i.threshold
@@ -46,13 +47,13 @@ class _HomeScreenState extends State<HomeScreen> {
           // Main Content
           Expanded(
             child: prov.items.isEmpty
-                ? _buildEmptyState()
-                : _buildInventoryList(prov),
+                ? _buildEmptyState(isDark)
+                : _buildInventoryList(prov, isDark),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddItemDialog(context),
+        onPressed: () => _showAddItemDialog(context, isDark),
         icon: const Icon(Icons.add_rounded),
         label: const Text('Add Item'),
       ),
@@ -80,7 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.inventory_2_rounded, color: Colors.white, size: 24),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            'lib/screens/image-removebg-preview (2).png',
+                            width: 24,
+                            height: 24,
+                            errorBuilder: (_, __, ___) => const Icon(Icons.inventory_2_rounded, color: Colors.white, size: 24),
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       const Column(
@@ -191,8 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
@@ -202,16 +211,19 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Icon(
                 icon,
-                size: 18,
+                size: 16,
                 color: isSelected ? AppTheme.primaryColor : Colors.white70,
               ),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? AppTheme.primaryColor : Colors.white70,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  fontSize: 13,
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? AppTheme.primaryColor : Colors.white70,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    fontSize: 12,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -221,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -241,26 +253,26 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No items yet',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Start by adding your first inventory item',
               style: TextStyle(
                 fontSize: 16,
-                color: AppTheme.textSecondary,
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
-              onPressed: () => _showAddItemDialog(context),
+              onPressed: () => _showAddItemDialog(context, isDark),
               icon: const Icon(Icons.add_rounded),
               label: const Text('Add Your First Item'),
             ),
@@ -270,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildInventoryList(StockProvider prov) {
+  Widget _buildInventoryList(StockProvider prov, bool isDark) {
     final filtered = prov.items
         .where((it) => it.name.toLowerCase().contains(_query.toLowerCase()))
         .toList();
@@ -296,6 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     prov.items.length.toString(),
                     Icons.inventory_2_outlined,
                     AppTheme.primaryColor,
+                    isDark,
                   )),
                   const SizedBox(width: 12),
                   Expanded(child: _buildStatCard(
@@ -303,13 +316,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     _formatNumber(totalUnits),
                     Icons.all_inbox_outlined,
                     AppTheme.successColor,
+                    isDark,
                   )),
                   const SizedBox(width: 12),
                   Expanded(child: _buildStatCard(
                     'Low Stock',
                     lowStockItems.length.toString(),
                     Icons.warning_amber_rounded,
-                    lowStockItems.isEmpty ? AppTheme.textMuted : AppTheme.warningColor,
+                    lowStockItems.isEmpty ? (isDark ? AppTheme.darkTextMuted : AppTheme.textMuted) : AppTheme.warningColor,
+                    isDark,
                   )),
                 ],
               ),
@@ -324,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onChanged: (v) => setState(() => _query = v),
                 decoration: InputDecoration(
                   hintText: 'Search items...',
-                  prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.textMuted),
+                  prefixIcon: Icon(Icons.search_rounded, color: isDark ? AppTheme.darkTextMuted : AppTheme.textMuted),
                   suffixIcon: _query.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear_rounded),
@@ -345,14 +360,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     'Inventory (${filtered.length})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: () => _showQuickStockDialog(context, prov, true),
+                    onPressed: () => _showQuickStockDialog(context, prov, true, isDark),
                     icon: const Icon(Icons.add_circle_outline, size: 18),
                     label: const Text('Quick Add'),
                   ),
@@ -366,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildItemCard(filtered[index], prov),
+                (context, index) => _buildItemCard(filtered[index], prov, isDark),
                 childCount: filtered.length,
               ),
             ),
@@ -376,13 +391,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(String label, String value, IconData icon, Color color, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.darkCardColor : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppTheme.cardShadow,
+        boxShadow: isDark ? null : AppTheme.cardShadow,
+        border: isDark ? Border.all(color: AppTheme.darkBorderColor) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,9 +423,9 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppTheme.textSecondary,
+              color: isDark ? AppTheme.darkTextSecondary : AppTheme.textSecondary,
             ),
           ),
         ],
@@ -417,7 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildItemCard(StockItem item, StockProvider prov) {
+  Widget _buildItemCard(StockItem item, StockProvider prov, bool isDark) {
     final isLowStock = item.threshold > 0 && item.quantity <= item.threshold;
     final isOutOfStock = item.quantity == 0;
     final lastTx = prov.lastTransactionFor(item.id!);
@@ -425,12 +441,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.darkCardColor : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppTheme.cardShadow,
-        border: isLowStock
-            ? Border.all(color: AppTheme.warningColor.withValues(alpha: 0.5), width: 1.5)
-            : null,
+        boxShadow: isDark ? null : AppTheme.cardShadow,
+        border: Border.all(
+          color: isLowStock 
+              ? AppTheme.warningColor.withValues(alpha: 0.5) 
+              : (isDark ? AppTheme.darkBorderColor : Colors.transparent),
+          width: isLowStock ? 1.5 : 1,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
@@ -458,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             : LinearGradient(
                                 colors: [AppTheme.successColor, AppTheme.successColor.withValues(alpha: 0.8)],
                               ),
-                    color: isOutOfStock ? AppTheme.textMuted : null,
+                    color: isOutOfStock ? (isDark ? AppTheme.darkTextMuted : AppTheme.textMuted) : null,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
@@ -481,10 +500,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         item.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
+                          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -494,14 +513,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppTheme.surfaceColor,
+                                color: isDark ? AppTheme.darkSurfaceColor : AppTheme.surfaceColor,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 item.brand!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: AppTheme.textSecondary,
+                                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.textSecondary,
                                 ),
                               ),
                             ),
@@ -529,9 +548,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 6),
                         Text(
                           '${lastTx.delta > 0 ? '+' : ''}${lastTx.delta} • ${_formatTime(lastTx.dateTime)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppTheme.textMuted,
+                            color: isDark ? AppTheme.darkTextMuted : AppTheme.textMuted,
                           ),
                         ),
                       ],
@@ -594,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showAddItemDialog(BuildContext context) {
+  void _showAddItemDialog(BuildContext context, bool isDark) {
     final formKey = GlobalKey<FormState>();
     String name = '';
     int quantity = 0;
@@ -606,9 +625,9 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: isDark ? AppTheme.darkCardColor : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
         child: Form(
@@ -620,9 +639,13 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Add New Item',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 20, 
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                    ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(ctx),
@@ -692,7 +715,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showQuickStockDialog(BuildContext ctx, StockProvider prov, bool isIn) {
+  void _showQuickStockDialog(BuildContext ctx, StockProvider prov, bool isIn, bool isDark) {
     if (prov.items.isEmpty) {
       ScaffoldMessenger.of(ctx).showSnackBar(
         const SnackBar(content: Text('No items available')),
@@ -710,9 +733,9 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (sheetCtx) => StatefulBuilder(
         builder: (context, setSheetState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.darkCardColor : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(sheetCtx).viewInsets.bottom + 24),
           child: Form(
@@ -723,11 +746,16 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   isIn ? 'Quick Stock In' : 'Quick Stock Out',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<StockItem>(
                   decoration: const InputDecoration(labelText: 'Select Item'),
+                  dropdownColor: isDark ? AppTheme.darkCardColor : Colors.white,
                   items: prov.items.map((item) => DropdownMenuItem(
                     value: item,
                     child: Text('${item.name} (${item.quantity})'),

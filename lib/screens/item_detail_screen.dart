@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/stock_provider.dart';
 import '../models/stock_item.dart';
 import '../models/stock_transaction.dart';
+import '../widgets/gradient_app_bar.dart';
 
 class ItemDetailScreen extends StatelessWidget {
   final StockItem item;
@@ -12,6 +13,7 @@ class ItemDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<StockProvider>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Get fresh item data
     final currentItem = prov.items.firstWhere(
@@ -29,8 +31,8 @@ class ItemDetailScreen extends StatelessWidget {
     final isOutOfStock = currentItem.quantity == 0;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(currentItem.name),
+      appBar: GradientAppBar(
+        title: currentItem.name,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
